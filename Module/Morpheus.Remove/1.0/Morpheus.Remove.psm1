@@ -30,7 +30,7 @@
                 ConvertFrom-Json | select -ExpandProperty instance*
 
                 #User flag lookup
-                $var = Check-Flags -var $var -Name $Name -ID $ID -Cloud $Cloud -CloudId $CloudId -Group $Group -GroupId $GroupId
+                $var = Compare-Flags -var $var -Name $Name -ID $ID -Cloud $Cloud -CloudId $CloudId -Group $Group -GroupId $GroupId
 
                 #Process request
                 Foreach ($v in $var) {
@@ -80,7 +80,7 @@ Function Remove-MDPolicy {
                 ConvertFrom-Json | select -ExpandProperty policies 
 
                 #User flag lookup
-                $var = Check-Flags -var $var -Name $Name -ID $ID -Enabled $Enabled -PolicyType $PolicyType
+                $var = Compare-Flags -var $var -Name $Name -ID $ID -Enabled $Enabled -PolicyType $PolicyType
 
                 If (!$var) {
                     $Error.Count = 1
@@ -89,7 +89,7 @@ Function Remove-MDPolicy {
                 Foreach ($v in $var) {
                     $N = $v.name
                     If ($PSCmdlet.ShouldProcess("$n","Remove Policy")) {
-                        Invoke-WebRequest -Method Delete -Uri ($URL + $API + $v.id) -Headers $Header
+                        Invoke-WebRequest -Method Delete -Uri ($URL + $API + $v.id + '?') -Headers $Header
                         }
                     }
                 }
