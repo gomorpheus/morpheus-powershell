@@ -48,23 +48,26 @@
 
         )    
 
-    Write-Host "BEGIN: Compare-Flags" -ForegroundColor DarkGreen
-    Write-Host "Var: $($var)" -ForegroundColor DarkMagenta
-    if ($PipelineConstruct -eq "workflows"){
-        $var = $var.taskSets
-    }else{
-        $var = $var.$construct
+    #Write-Host "BEGIN: Compare-Flags" -ForegroundColor DarkGreen
+    #Write-Host "Var: $($var)" -ForegroundColor DarkMagenta
+    if ($Construct.Contains("-")){
+        #Write-Host "Found a dash. Killing it!"
+        $Construct = $Construct -replace '[-]'
+        #Write-Host "New construct: $($Construct)"
     }
+
+    $var = $var.$construct
+
 
     $return =@()
 
-    Write-Host "Input Object: $($InputObject)" -ForegroundColor DarkMagenta
-    Write-Host "Construct: $($construct)" -ForegroundColor DarkMagenta
-    Write-Host "Pipeline Construct: $($PipelineConstruct)" -ForegroundColor DarkMagenta
-    Write-Host $var  -ForegroundColor DarkMagenta
+    #Write-Host "Input Object: $($InputObject)" -ForegroundColor DarkMagenta
+    #Write-Host "Construct: $($construct)" -ForegroundColor DarkMagenta
+    #Write-Host "Pipeline Construct: $($PipelineConstruct)" -ForegroundColor DarkMagenta
+    #Write-Host $var  -ForegroundColor DarkMagenta
 
     if ($PipelineConstruct -ne $Construct){
-        Write-Host "Found pipeline construct: $($PipelineConstruct)"  -ForegroundColor DarkMagenta
+        #Write-Host "Found pipeline construct: $($PipelineConstruct)"  -ForegroundColor DarkMagenta
         # This switch checks for the initial command in the pipeline          
         switch ($PipelineConstruct){
             accounts {
@@ -209,36 +212,45 @@
                 }
             }
             #Workflows
-            workflows {
+            taskSets {
                 switch ($construct){
                     tasks {
                         $return = @()
                         foreach ($item in $InputObject.tasks){
                             foreach ($obj in $var){
-                                if ($obj.id -like $item.id){
+                                #Write-Host "Checking object: $obj" -ForegroundColor DarkBlue
+                                #Write-Host "Checking item: $item" -ForegroundColor Blue
+                                if ($obj.id -like $item){
                                     $return += $obj
                                 }
                             }
                         }
                         $var = $return
                     }
+                    # default {
+                    #     $var = $var | Where-Object { $_.zone.id -Like $InputObject.id }
+                    # }   
+                }
+            }
+            instanceTypes {
+                switch ($construct){
                     default {
-                        $var = $var | Where-Object { $_.zone.id -Like $InputObject.id }
+                        $var = $var | Where-Object { $_.instanceType.id -Like $InputObject.id }
                     }   
                 }
             }
         }
     }else{
-        Write-Host "Pipeline: $($PipelineConstruct) is the same as Construct:$($Construct)" -ForegroundColor DarkMagenta
+        #Write-Host "Pipeline: $($PipelineConstruct) is the same as Construct:$($Construct)" -ForegroundColor DarkMagenta
     }
 
     If ($Username) {
-        Write-Host "Found by username"
+        #Write-Host "Found by username"
         $var = $var | where username -like $Username
         }
 
     If ($Name) {
-        Write-Host "Found by name"
+        #Write-Host "Found by name"
         $var = $var | Where-Object name -like $Name
         }
 
@@ -357,8 +369,8 @@
     If ($Type) {
         $var = $var | Where-Object type -like $Type
         }
-    Write-Host "Var: $($var)" -ForegroundColor DarkMagenta
-    Write-Host "END: Compare-Flags" -ForegroundColor DarkGreen
+    #Write-Host "Var: $($var)" -ForegroundColor DarkMagenta
+    #Write-Host "END: Compare-Flags" -ForegroundColor DarkGreen
     return $var
 }
 
@@ -389,10 +401,10 @@ function Get-PipelineConstruct {
 #         $InputObjectPath,
 #         $var
 #     )
-#     Write-Host "Input Object: $($InputObject.Servers)"
-#     Write-Host "Input Object Path: $($InputObjectPath)"
-#     Write-Host "$($InputObject.Servers)" -ForegroundColor DarkRed
-#     Write-Host "var: $($var)"
+#     #Write-Host "Input Object: $($InputObject.Servers)"
+#     #Write-Host "Input Object Path: $($InputObjectPath)"
+#     #Write-Host "$($InputObject.Servers)" -ForegroundColor DarkRed
+#     #Write-Host "var: $($var)"
 #     $return = @()
 #     foreach ($item in $InputObject.$InputObjectPath){
 #         foreach ($obj in $var){
